@@ -277,19 +277,19 @@
         
         <div class="clue">
             <p><strong>ÉNIGME 3 - Troisième chiffre:</strong></p>
-            <p>5 témoins ont vu le suspect à différents moments:</p>
+            <p>Les témoins ont vu le suspect à différents moments:</p>
             <p>- 2 l'ont vu le matin</p>
             <p>- 3 l'ont vu l'après-midi</p>
             <p>- 1 personne l'a vu matin ET après-midi</p>
-            <p><em>Combien de témoins différents au total?</em></p>
+            <p><em>Combien y a-t-il de témoins différents au total?</em></p>
         </div>
         
         <div class="clue">
             <p><strong>ÉNIGME 4 - Quatrième chiffre:</strong></p>
             <p>Dans un parking de 10 places numérotées de 0 à 9:</p>
             <p>- Les places paires sont toutes occupées</p>
-            <p>- Il y a 3 places libres au total</p>
-            <p>- Le suspect X s'est garé sur la plus grande place libre</p>
+            <p>- Toutes les places inférieures à 4 sont occupées</p>
+            <p>- Le suspect X s'est garé sur la première place venue</p>
             <p><em>Quel est le numéro de sa place?</em></p>
         </div>
 
@@ -352,8 +352,8 @@
             
             const code = digit1 + digit2 + digit3 + digit4;
             
-            // Code: 1947 (solutions des énigmes)
-            if (code === '1947') {
+            // Code: 1945 (solutions des énigmes)
+            if (code === '1945') {
                 document.getElementById('result').classList.add('show');
                 document.querySelectorAll('.digit-input').forEach(input => {
                     input.style.borderColor = '#33ff33';
