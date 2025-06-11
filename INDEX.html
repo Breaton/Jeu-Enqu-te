@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquête Policière - Division des Affaires Non Résolues</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.03),
+                rgba(0, 255, 0, 0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #ff3333;
+            text-shadow: 0 0 10px #ff3333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 1.2em;
+            letter-spacing: 3px;
+        }
+
+        .case-file {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-file::before {
+            content: "CONFIDENTIEL";
+            position: absolute;
+            top: 10px;
+            right: -35px;
+            background: #ff3333;
+            color: white;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .scenario {
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-left: 3px solid #ffff33;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 15px rgba(255,51,51,0.3);
+            display: block;
+            margin: 0 auto;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(255,51,51,0.5);
+        }
+
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .result {
+            text-align: center;
+            padding: 40px;
+            background: rgba(0,255,0,0.1);
+            border: 2px solid #33ff33;
+            border-radius: 10px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .result h2 {
+            color: #33ff33;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px #33ff33;
+        }
+
+        .code-lock {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .digit-input {
+            width: 60px;
+            height: 80px;
+            font-size: 2em;
+            text-align: center;
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #ff3333;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .digit-input:focus {
+            outline: none;
+            border-color: #ff3333;
+            box-shadow: 0 0 15px rgba(255,51,51,0.5);
+            transform: scale(1.1);
+        }
+
+        .digit-input.wrong {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .clue {
+            background: rgba(255,255,0,0.1);
+            border-left: 3px solid #ffff33;
+            padding: 15px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .evidence-tag {
+            display: inline-block;
+            background: #333;
+            color: #ffff33;
+            padding: 5px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .typewriter {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end);
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 2px solid #ff3333;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            color: #ff3333;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="timer" id="timer">00:00</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>DIVISION DES AFFAIRES NON RÉSOLUES</h1>
+            <p class="subtitle">SYSTÈME D'ENQUÊTE NUMÉRIQUE</p>
+        </div>
+
+        <div class="case-file">
+            <h2>DOSSIER CRIMINEL #M-2025-048</h2>
+            <p style="margin-top: 15px; color: #999;">Affaire: Homicide - Premier suspect</p>
+            <div style="margin-top: 10px;">
+                <span class="evidence-tag">Meurtre</span>
+                <span class="evidence-tag">Indices codés</span>
+                <span class="evidence-tag">Suspect X</span>
+            </div>
+        </div>
+
+        <div class="scenario">
+            <h3>Instructions:</h3>
+            <p>Pour accéder au verdict final, résolvez ces énigmes policières. Chaque réponse vous donnera un chiffre du code.</p>
+        </div>
+
+        <div class="clue">
+            <p><strong>ÉNIGME 1 - Premier chiffre:</strong></p>
+            <p>Dans une pièce, il y a 4 personnes. Un crime est commis. L'enquête révèle:</p>
+            <p>- 3 personnes étaient ensemble dans le salon</p>
+            <p>- Le coupable était seul</p>
+            <p>- Le suspect X était avec 2 autres personnes</p>
+            <p><em>Si X est innocent, combien de suspects reste-t-il?</em></p>
+        </div>
+        
+        <div class="clue">
+            <p><strong>ÉNIGME 2 - Deuxième chiffre:</strong></p>
+            <p>Un coffre a été ouvert avec un code à 3 chiffres. L'enquête révèle:</p>
+            <p>- La somme des chiffres est 12</p>
+            <p>- Tous les chiffres sont différents</p>
+            <p>- Le plus grand chiffre possible est utilisé</p>
+            <p><em>Quel est le plus grand chiffre du code?</em></p>
+        </div>
+        
+        <div class="clue">
+            <p><strong>ÉNIGME 3 - Troisième chiffre:</strong></p>
+            <p>5 témoins ont vu le suspect à différents moments:</p>
+            <p>- 2 l'ont vu le matin</p>
+            <p>- 3 l'ont vu l'après-midi</p>
+            <p>- 1 personne l'a vu matin ET après-midi</p>
+            <p><em>Combien de témoins différents au total?</em></p>
+        </div>
+        
+        <div class="clue">
+            <p><strong>ÉNIGME 4 - Quatrième chiffre:</strong></p>
+            <p>Dans un parking de 10 places numérotées de 0 à 9:</p>
+            <p>- Les places paires sont toutes occupées</p>
+            <p>- Il y a 3 places libres au total</p>
+            <p>- Le suspect X s'est garé sur la plus grande place libre</p>
+            <p><em>Quel est le numéro de sa place?</em></p>
+        </div>
+
+        <h3 style="text-align: center; margin: 30px 0; color: #ff3333;">
+            ENTREZ LE CODE POUR ACCÉDER AU VERDICT
+        </h3>
+
+        <div class="code-lock">
+            <input type="number" class="digit-input" min="0" max="9" id="digit1">
+            <input type="number" class="digit-input" min="0" max="9" id="digit2">
+            <input type="number" class="digit-input" min="0" max="9" id="digit3">
+            <input type="number" class="digit-input" min="0" max="9" id="digit4">
+        </div>
+
+        <button onclick="checkCode()">VÉRIFIER LE CODE</button>
+
+        <div class="result" id="result">
+            <h2>VERDICT: NATHALIE EST INNOCENTE</h2>
+            <p>Brillant ! Vos capacités de déduction ont prouvé l'innocence du suspect.</p>
+            <p class="typewriter">Justice est rendue grâce à votre perspicacité...</p>
+        </div>
+    </div>
+
+    <script>
+        // Timer
+        let seconds = 0;
+        setInterval(() => {
+            seconds++;
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById('timer').textContent = 
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }, 1000);
+
+        // Code verification logic
+        document.querySelectorAll('.digit-input').forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length > 1) {
+                    this.value = this.value.slice(0, 1);
+                }
+                
+                // Auto-focus next input
+                if (this.value && index < 3) {
+                    document.querySelectorAll('.digit-input')[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    document.querySelectorAll('.digit-input')[index - 1].focus();
+                }
+            });
+        });
+
+        function checkCode() {
+            const digit1 = document.getElementById('digit1').value;
+            const digit2 = document.getElementById('digit2').value;
+            const digit3 = document.getElementById('digit3').value;
+            const digit4 = document.getElementById('digit4').value;
+            
+            const code = digit1 + digit2 + digit3 + digit4;
+            
+            // Code: 1947 (solutions des énigmes)
+            if (code === '1947') {
+                document.getElementById('result').classList.add('show');
+                document.querySelectorAll('.digit-input').forEach(input => {
+                    input.style.borderColor = '#33ff33';
+                    input.disabled = true;
+                });
+            } else {
+                document.querySelectorAll('.digit-input').forEach(input => {
+                    input.style.borderColor = '#ff3333';
+                    input.classList.add('wrong');
+                });
+                setTimeout(() => {
+                    document.querySelectorAll('.digit-input').forEach(input => {
+                        input.style.borderColor = '#444';
+                        input.classList.remove('wrong');
+                        input.value = '';
+                    });
+                    document.getElementById('digit1').focus();
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
